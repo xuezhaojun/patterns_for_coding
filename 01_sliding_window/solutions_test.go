@@ -2,6 +2,7 @@ package sliding_window
 
 import "testing"
 
+// FindAveragesOfSubArrays
 func FindAveragesOfSubArrays(K int, arr []int) []float64 {
 	results := []float64{}
 	windowsSum, windowsStart := 0, 0
@@ -23,6 +24,7 @@ func TestFindAveragesOfSubArrays(t *testing.T) {
 	t.Log("Averages of subarrays of size K: ", results)
 }
 
+// FindMaxSubArrayOfSizeK
 func FindMaxSubArrayOfSizeK(K int, arr []int) int {
 	max := 0
 	windowsSum, windowsStart := 0, 0
@@ -43,6 +45,7 @@ func TestFindMaxSubArrayOfSizeK(t *testing.T) {
 	t.Log(FindMaxSubArrayOfSizeK(2, []int{2, 3, 4, 1, 5})) // 预期结果为7
 }
 
+// SmallestSubarrayWithGivenSum
 func SmallestSubarrayWithGivenSum(arr []int, s int) int {
 	sumShortest := len(arr) + 1
 	sumLen := 0
