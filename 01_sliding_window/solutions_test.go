@@ -115,7 +115,7 @@ func FruitsIntoBaskets(fruits []byte) int {
 		if len(windowsMap) <= 2 && longest < windowsEnd-windowsStart+1 {
 			longest = windowsEnd - windowsStart + 1
 		}
-		for len(windowsMap) > 2 && windowsStart <= windowsEnd {
+		for len(windowsMap) > 2 {
 			if v, ok := windowsMap[fruits[windowsStart]]; ok && v == 1 {
 				delete(windowsMap, fruits[windowsStart])
 			} else {
