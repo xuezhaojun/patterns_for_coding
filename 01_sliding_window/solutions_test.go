@@ -76,3 +76,58 @@ func TestSmallestSubarrayWithGivenSum(t *testing.T) {
 	t.Log(SmallestSubarrayWithGivenSum([]int{2, 1, 5, 2, 8}, 7))    // 预期：1
 	t.Log(SmallestSubarrayWithGivenSum([]int{3, 4, 1, 1, 6}, 8))    // 预期：3
 }
+
+// LongestSubstringKDistinct
+func LongestSubstringKDistinct(s string, k int) int {
+	longest := 0
+	windowsStart := 0
+	windows := make(map[byte]int)
+	for windowsEnd := range s {
+		windows[s[windowsEnd]] += 1
+		if len(windows) <= k && windowsEnd-windowsStart+1 > longest {
+			longest = windowsEnd - windowsStart + 1
+		}
+		for len(windows) > k && windowsStart <= windowsEnd {
+			if v, ok := windows[s[windowsStart]]; ok && v == 1 {
+				delete(windows, s[windowsStart])
+			} else {
+				windows[s[windowsStart]] -= 1
+			}
+			windowsStart += 1
+		}
+	}
+	return longest
+}
+
+func TestLongestSubstringKDistinct(t *testing.T) {
+	t.Log(LongestSubstringKDistinct("araaci", 2)) // 预期：4
+	t.Log(LongestSubstringKDistinct("raa", 1))    // 预期：2
+	t.Log(LongestSubstringKDistinct("cbbebi", 3)) // 预期：5
+}
+
+// Fruits into Baskets
+func FruitsIntoBaskets(fruits []byte) int {
+	longest := 0
+	windowsMap := make(map[byte]int)
+	windowsStart := 0
+	for windowsEnd, f := range fruits {
+		windowsMap[f] += 1
+		if len(windowsMap) <= 2 && longest < windowsEnd-windowsStart+1 {
+			longest = windowsEnd - windowsStart + 1
+		}
+		for len(windowsMap) > 2 && windowsStart <= windowsEnd {
+			if v, ok := windowsMap[fruits[windowsStart]]; ok && v == 1 {
+				delete(windowsMap, fruits[windowsStart])
+			} else {
+				windowsMap[fruits[windowsStart]] -= 1
+			}
+			windowsStart += 1
+		}
+	}
+	return longest
+}
+
+func TestFruitsIntoBaskets(t *testing.T) {
+	t.Log(FruitsIntoBaskets([]byte{'A', 'B', 'C', 'A', 'C'}))      // 预期：3
+	t.Log(FruitsIntoBaskets([]byte{'A', 'B', 'C', 'B', 'B', 'C'})) // 预期：5
+}
