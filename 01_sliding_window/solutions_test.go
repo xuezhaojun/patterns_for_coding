@@ -160,3 +160,44 @@ func TestNoRepeatSubstring(t *testing.T) {
 	t.Log(NoRepeatSubstring("abbbb"))   // 预期：2
 	t.Log(NoRepeatSubstring("abccde"))  // 预期：3
 }
+
+// CharacterReplacement
+// leetcode的一道类似的题 https://leetcode-cn.com/problems/longest-repeating-character-replacement/solution/tong-guo-ci-ti-liao-jie-yi-xia-shi-yao-shi-hua-don/
+// 本题难点在于： maxRepeatLetterNumber 这个变量，一开始容易理解为 当前窗口中的最大重复字符数； 但实际这个变量的含义为，所有满足条件的窗口中，最大重复字符数
+// 在本题中，因为我们只对“最长，有效的子字符串”感兴趣，所以窗口其实并没有shrink（收缩），严格来讲除了expand（扩展），就是做了shift（平移，即整体向右边移动的一格）
+// 而平移过程中，当前窗口可能会覆盖到“无效”的子字符串（即不满足 windowsLength - maxRepeatChar <= k）
+// 按理来收，每次平移之后，需要重新计算当前windows中的maxRepeatedChar，但是maxrepeatChar准确来说是历史上最大的重复值
+// shrink 仅会发生在 maxRepeatChar 没有更新（即变得更大的时候), 且当前窗口长度-maxRepeatChar > k 的时候
+func CharacterReplacement(s string, k int) int {
+	windowsStart := 0
+	longest := 0
+	maxRepeatLetterNumber := 0
+	windowsMap := make(map[byte]int) // key: 字符串中的字符 value: 字符在window中出现的次数
+	sbyte := []byte(s)
+	for windowEnd, b := range sbyte {
+		windowsMap[b] += 1
+		if windowsMap[b] >= maxRepeatLetterNumber {
+			maxRepeatLetterNumber = windowsMap[b]
+		}
+
+		// 否则则有机会执行expand
+		if windowEnd-windowsStart+1-maxRepeatLetterNumber > k {
+			windowsMap[sbyte[windowsStart]] -= 1
+			windowsStart += 1
+			continue
+		}
+
+		// 仅当expand的时候，longest可能会更新
+		if longest < windowEnd-windowsStart+1 {
+			longest = windowEnd - windowsStart + 1
+		}
+	}
+	return longest
+}
+
+func TestCharacterReplacement(t *testing.T) {
+	t.Log(CharacterReplacement("aabccbb", 2)) // 预期：5
+	t.Log(CharacterReplacement("abbcb", 1))   // 预期：4
+	t.Log(CharacterReplacement("abccde", 1))  // 预期：3
+	t.Log(CharacterReplacement("baaab", 2))   // 预期：5
+}
