@@ -131,3 +131,32 @@ func TestFruitsIntoBaskets(t *testing.T) {
 	t.Log(FruitsIntoBaskets([]byte{'A', 'B', 'C', 'A', 'C'}))      // 预期：3
 	t.Log(FruitsIntoBaskets([]byte{'A', 'B', 'C', 'B', 'B', 'C'})) // 预期：5
 }
+
+// NoRepeatSubstring
+func NoRepeatSubstring(s string) int {
+	windowsStart := 0
+	windowsMap := make(map[byte]int) // key是字符，int是字符在字符串中的位置
+	maxLength := 0
+	for windowsEnd := range s {
+		rightChar := s[windowsEnd] // 也就是滑窗右边的值
+		// 如果这个rightChar已经再windows中存在了，那么就执行shrink操作
+		if index, ok := windowsMap[rightChar]; ok {
+			// 此处的shrink也是一个tricky，和之前的问题不同，此处的windowsStart可以直接的shrink到字符串中，上一个rightChar出现的位置的下一个位置
+			// 此处还有一个tricky，我们没有实际的在map讲shrink过的字符删除，判断一个字符是否被删除，只要判断它的index是否大于windowsStart即可
+			if windowsStart <= index {
+				windowsStart = index + 1
+			}
+		}
+		windowsMap[rightChar] = windowsEnd
+		if windowsEnd-windowsStart+1 > maxLength {
+			maxLength = windowsEnd - windowsStart + 1
+		}
+	}
+	return maxLength
+}
+
+func TestNoRepeatSubstring(t *testing.T) {
+	t.Log(NoRepeatSubstring("aabccbb")) // 预期：3
+	t.Log(NoRepeatSubstring("abbbb"))   // 预期：2
+	t.Log(NoRepeatSubstring("abccde"))  // 预期：3
+}
