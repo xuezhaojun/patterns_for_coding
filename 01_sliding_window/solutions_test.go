@@ -1,6 +1,8 @@
 package sliding_window
 
-import "testing"
+import (
+	"testing"
+)
 
 // FindAveragesOfSubArrays
 func FindAveragesOfSubArrays(K int, arr []int) []float64 {
@@ -200,4 +202,31 @@ func TestCharacterReplacement(t *testing.T) {
 	t.Log(CharacterReplacement("abbcb", 1))   // 预期：4
 	t.Log(CharacterReplacement("abccde", 1))  // 预期：3
 	t.Log(CharacterReplacement("baaab", 2))   // 预期：5
+}
+
+// LengthOfLongestSubstring
+func LengthOfLongestSubstring(arr []int, k int) int {
+	longest := 0
+	windowStart := 0
+	frequecyOfZero := 0
+	for windowEnd := range arr {
+		if arr[windowEnd] == 0 {
+			frequecyOfZero += 1
+		}
+		for frequecyOfZero > k {
+			if arr[windowStart] == 0 {
+				frequecyOfZero -= 1
+			}
+			windowStart += 1
+		}
+		if windowEnd-windowStart+1 > k {
+			longest = windowEnd - windowStart + 1
+		}
+	}
+	return longest
+}
+
+func TestLengthOfLongestSubstring(t *testing.T) {
+	t.Log(LengthOfLongestSubstring([]int{0, 1, 1, 0, 0, 0, 1, 1, 0, 1, 1}, 2))
+	t.Log(LengthOfLongestSubstring([]int{0, 1, 0, 0, 1, 1, 0, 1, 1, 0, 0, 1, 1}, 3))
 }
