@@ -334,3 +334,53 @@ func TestFindPermutation(t *testing.T) {
 	fmt.Println(FindPermutation2("bcdxabcdy", "bcdxabcdy")) // except: true
 	fmt.Println(FindPermutation2("aaacb", "abc"))           // except : true
 }
+
+// Problem Chanlenge : StringAnagrams
+// 本题基本就是上一个题的延申，只要把结果从返回一个改为返回多个即可
+func StringAnagrams(str, pattern string) []int {
+	// init
+	frequency := make(map[byte]int)
+	windowStart, match := 0, 0
+	sbyte1 := []byte(str)
+	sbyte2 := []byte(pattern)
+	result := []int{}
+
+	for _, b := range sbyte2 {
+		frequency[b] += 1
+	}
+
+	for windowEnd := range sbyte1 {
+		rightChar := sbyte1[windowEnd]
+		if _, ok := frequency[rightChar]; ok {
+			frequency[rightChar] -= 1
+			if frequency[rightChar] == 0 {
+				match += 1
+			}
+		}
+
+		// 我喜欢这里的技巧，把对match的比较提前
+		// 在routine中，match总能移动到一个适当的位置，以免被多写几次
+		// expand - shrink - compare 也可以改写为 expand - compare - shrink 结果是不变的，但是逻辑看起来清楚一些
+		if match == len(frequency) { // 这里是和frequency比较，而不是len of s2
+			result = append(result, windowStart)
+		}
+
+		if windowEnd >= len(sbyte2)-1 {
+			leftChar := sbyte1[windowStart]
+			if _, ok := frequency[leftChar]; ok {
+				frequency[leftChar] += 1
+				if frequency[leftChar] == 1 {
+					match -= 1
+				}
+			}
+			windowStart += 1
+		}
+	}
+
+	return result
+}
+
+func TestStringAnagrams(t *testing.T) {
+	fmt.Println(StringAnagrams("ppqp", "pq"))
+	fmt.Println(StringAnagrams("abbcabc", "abc"))
+}
