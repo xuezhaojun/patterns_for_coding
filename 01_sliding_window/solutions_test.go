@@ -1,6 +1,9 @@
+// 解题心得：
+// * 求一个序列中满足某些条件的字串，都尝试滑动窗口来解决
 package sliding_window
 
 import (
+	"fmt"
 	"testing"
 )
 
@@ -229,4 +232,105 @@ func LengthOfLongestSubstring(arr []int, k int) int {
 func TestLengthOfLongestSubstring(t *testing.T) {
 	t.Log(LengthOfLongestSubstring([]int{0, 1, 1, 0, 0, 0, 1, 1, 0, 1, 1}, 2))
 	t.Log(LengthOfLongestSubstring([]int{0, 1, 0, 0, 1, 1, 0, 1, 1, 0, 0, 1, 1}, 3))
+}
+
+// Problem Challenge 1 : FindPermutation
+func FindPermutation(s1, s2 string) bool {
+	// init
+	exist := make(map[byte]bool)
+	frequency := make(map[byte]int)
+	completed := make(map[byte]struct{})
+	windowStart := 0
+	sbyte1 := []byte(s1)
+	sbyte2 := []byte(s2)
+
+	for _, b := range sbyte2 {
+		exist[b] = true
+		frequency[b] += 1
+		completed[b] = struct{}{}
+	}
+
+	for windowEnd := range sbyte1 {
+		if exist[sbyte1[windowEnd]] {
+			frequency[sbyte1[windowEnd]] -= 1
+			if frequency[sbyte1[windowEnd]] == 0 {
+				delete(completed, sbyte1[windowEnd])
+			}
+		}
+
+		if windowEnd < len(sbyte2) {
+			continue
+		}
+
+		if exist[sbyte1[windowStart]] {
+			frequency[sbyte1[windowStart]] += 1
+			if frequency[sbyte1[windowStart]] == 1 {
+				completed[sbyte1[windowStart]] = struct{}{}
+			}
+		}
+		windowStart += 1
+
+		if len(completed) == 0 {
+			return true
+		}
+	}
+
+	if len(completed) == 0 {
+		return true
+	}
+
+	return false
+}
+
+// 官方做法基本和我的做法相同，重点在于最后的统计
+// 我是通过一个奇怪的三重map的组成，而其实只需要一个map外加一个match计数
+// 用match的大小和子串的大小做比较，判断是否全匹配
+func FindPermutation2(s1, s2 string) bool {
+	// init
+	frequency := make(map[byte]int)
+	windowStart, match := 0, 0
+	sbyte1 := []byte(s1)
+	sbyte2 := []byte(s2)
+
+	for _, b := range sbyte2 {
+		frequency[b] += 1
+	}
+
+	for windowEnd := range sbyte1 {
+		rightChar := sbyte1[windowEnd]
+		if _, ok := frequency[rightChar]; ok {
+			frequency[rightChar] -= 1
+			if frequency[rightChar] == 0 {
+				match += 1
+			}
+		}
+
+		// 我喜欢这里的技巧，把对match的比较提前
+		// 在routine中，match总能移动到一个适当的位置，以免被多写几次
+		// expand - shrink - compare 也可以改写为 expand - compare - shrink 结果是不变的，但是逻辑看起来清楚一些
+		if match == len(frequency) { // 这里是和frequency比较，而不是len of s2
+			return true
+		}
+
+		if windowEnd >= len(sbyte2)-1 {
+			leftChar := sbyte1[windowStart]
+			if _, ok := frequency[leftChar]; ok {
+				frequency[leftChar] += 1
+				if frequency[leftChar] == 1 {
+					match -= 1
+				}
+			}
+			windowStart += 1
+		}
+	}
+
+	return false
+}
+
+func TestFindPermutation(t *testing.T) {
+	fmt.Println(FindPermutation2("oidbcaf", "abc"))         // except : true
+	fmt.Println(FindPermutation2("odicf", "dc"))            // except : false
+	fmt.Println(FindPermutation2("abc", "abc"))             // except: true
+	fmt.Println(FindPermutation2("bcdxabcdy", "bcdxabcdy")) // except: true
+	fmt.Println(FindPermutation2("aaacb", "abc"))           // except : true
 }
