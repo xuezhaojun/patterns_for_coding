@@ -381,6 +381,118 @@ func StringAnagrams(str, pattern string) []int {
 }
 
 func TestStringAnagrams(t *testing.T) {
-	fmt.Println(StringAnagrams("ppqp", "pq"))
-	fmt.Println(StringAnagrams("abbcabc", "abc"))
+	fmt.Println(StringAnagrams("ppqp", "pq"))     // [1,2]
+	fmt.Println(StringAnagrams("abbcabc", "abc")) // [2,3,4]
+}
+
+// MinimumWindowSubstring
+func MinimumWindowSubstring(str, pattern string) string {
+	frequency := make(map[byte]int)
+	match := 0
+	smallest := len(str) + 1
+	result := ""
+
+	// init from pattern
+	patternBytes := []byte(pattern)
+	for _, b := range patternBytes {
+		frequency[b] += 1
+	}
+
+	winStart := 0
+	strBytes := []byte(str)
+	for winEnd := range strBytes {
+		if _, ok := frequency[strBytes[winEnd]]; ok {
+			frequency[strBytes[winEnd]] -= 1
+			if frequency[strBytes[winEnd]] == 0 {
+				match += 1
+			}
+		}
+
+		// 直到match，才能进行shrink
+		if match < len(frequency) {
+			continue
+		}
+
+		for {
+			if match < len(frequency) {
+				break
+			}
+			if smallest > winEnd-winStart+1 {
+				smallest = winEnd - winStart + 1
+				result = str[winStart : winEnd+1]
+			}
+			if _, ok := frequency[strBytes[winStart]]; ok {
+				if frequency[strBytes[winStart]] == 0 {
+					match -= 1
+				}
+				frequency[strBytes[winStart]] += 1
+			}
+			winStart += 1
+		}
+	}
+
+	return result
+}
+
+// 本题和 leetcode https://leetcode-cn.com/problems/minimum-window-substring/ 相同，以上算法以通过leetcode的测例
+func TestMinimumWindowSubstring(t *testing.T) {
+	fmt.Println(MinimumWindowSubstring("aabdec", "abc"))  // abdec
+	fmt.Println(MinimumWindowSubstring("abdabca", "abc")) // abc
+	fmt.Println(MinimumWindowSubstring("adcad", "abc"))   // 空字符串
+}
+
+// WordsConcatenation
+// 这个题即使是官方给的解法，时间也是O(N*M*Len)
+// 此题种 words 可能含有重复的
+func WordsConcatenation(str string, words []string) []int {
+	// 首先判断边际情况
+	if len(words) == 0 || len(words[0]) == 0 {
+		return []int{}
+	}
+
+	// str的长度本身不够
+	wordsCount := len(words)
+	wordLen := len(words[0])
+	if len(str) < wordsCount*wordLen {
+		return []int{}
+	}
+
+	// 初始化map
+	result := []int{}
+	wordsMap := make(map[string]int)
+	for _, word := range words {
+		wordsMap[word] += 1
+	}
+
+	for i := 0; i <= len(str)-wordLen*wordsCount; i++ {
+		match := make(map[string]int)
+		for j := 0; j < wordsCount; j++ {
+			winStart := i + j*wordLen
+			winEnd := winStart + wordLen
+
+			// 找到当前的子串
+			subStr := str[winStart:winEnd]
+
+			if _, ok := wordsMap[subStr]; !ok {
+				// 如果当前字串不存在，则直接返回
+				break
+			}
+
+			match[subStr] += 1
+			if match[subStr] > wordsMap[subStr] {
+				break
+			}
+
+			if j == wordsCount-1 {
+				result = append(result, i)
+			}
+		}
+	}
+
+	return result
+}
+
+func TestWordsConcatenation(t *testing.T) {
+	fmt.Println(WordsConcatenation("catfoxcat", []string{"cat", "fox"}))    // [0,3]
+	fmt.Println(WordsConcatenation("catcatfoxfox", []string{"cat", "fox"})) // [3]
 }
