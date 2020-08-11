@@ -1,4 +1,5 @@
-// 双指针算法，用于找到一个【有序的】序列中，满足特定要求的几个元素(一对，三个，或者多个)
+// 双指针算法的使用场景：【重要】
+// 用于找到一个【有序的】序列中，满足特定要求的几个元素(一对，三个，或者多个，甚至一个序列)
 // 比如： 给定一个数字序列和一个target，找到序列中满足 a+b=target 的两个元素
 package two_pointers
 
@@ -71,4 +72,31 @@ func RemoveElement(arr []int, target int) int {
 func TestRemoveElement(t *testing.T) {
 	fmt.Println(RemoveElement([]int{3, 2, 3, 6, 3, 10, 9, 3}, 3)) // 4
 	fmt.Println(RemoveElement([]int{2, 11, 2, 2, 1}, 2))          // 2
+}
+
+// SquaringSortedArray
+func SquaringSortedArray(arr []int) []int {
+	left := 0
+	right := len(arr) - 1
+	newarr := make([]int, len(arr))
+	index := len(arr) - 1
+
+	for index > 0 {
+		if arr[left]*arr[left] > arr[right]*arr[right] {
+			newarr[index] = arr[left] * arr[left]
+			index--
+			left++
+		} else {
+			newarr[index] = arr[right] * arr[right]
+			index--
+			right--
+		}
+	}
+
+	return newarr
+}
+
+func TestSquaringSortedArray(t *testing.T) {
+	fmt.Println(SquaringSortedArray([]int{-2, -1, 0, 2, 3})) // [0, 1, 4, 4, 9]
+	fmt.Println(SquaringSortedArray([]int{-3, -1, 0, 1, 2})) // [0, 1, 1, 4, 9]
 }
