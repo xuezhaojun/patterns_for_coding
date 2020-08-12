@@ -5,6 +5,7 @@ package two_pointers
 
 import (
 	"fmt"
+	"sort"
 	"testing"
 )
 
@@ -99,4 +100,51 @@ func SquaringSortedArray(arr []int) []int {
 func TestSquaringSortedArray(t *testing.T) {
 	fmt.Println(SquaringSortedArray([]int{-2, -1, 0, 2, 3})) // [0, 1, 4, 4, 9]
 	fmt.Println(SquaringSortedArray([]int{-3, -1, 0, 1, 2})) // [0, 1, 1, 4, 9]
+}
+
+// TripletSumToZero
+// 同一个题见leetcode https://leetcode-cn.com/problems/3sum/submissions/
+// 再次做时间从 375ms 提高到了 40ms，而且代码量也减少了
+// 本题关键是如何做到准确的去重复
+func TripletSumToZero(arr []int) [][]int {
+	result := [][]int{}
+
+	sort.Slice(arr, func(i, j int) bool {
+		return arr[i] < arr[j]
+	})
+
+	for cur, a := range arr {
+		if cur != 0 && arr[cur] == arr[cur-1] {
+			continue
+		}
+		i := cur + 1
+		j := len(arr) - 1
+		for i < j {
+			if arr[i]+arr[j] < -a {
+				i++
+				for i < j && arr[i] == arr[i-1] {
+					i++
+				}
+			} else if arr[i]+arr[j] > -a {
+				j--
+				for i < j && arr[j] == arr[j+1] {
+					j--
+				}
+			} else {
+				result = append(result, []int{a, arr[i], arr[j]})
+				i++
+				for i < j && arr[i] == arr[i-1] {
+					i++
+				}
+			}
+		}
+	}
+
+	return result
+}
+
+func TestTripletSumToZero(t *testing.T) {
+	fmt.Println(TripletSumToZero([]int{-3, 0, 1, 2, -1, 1, -2})) // [-3, 1, 2], [-2, 0, 2], [-2, 1, 1], [-1, 0, 1]
+	fmt.Println(TripletSumToZero([]int{-5, 2, -1, -2, 3}))       // [-5, 2, 3], [-2, -1, 3]
+	fmt.Println(TripletSumToZero([]int{-1, 0, 1, 0}))            // [-1,0,1]
 }
