@@ -1,6 +1,8 @@
 // 双指针算法的使用场景：【重要】
 // 用于找到一个【有序的】序列中，满足特定要求的几个元素(一对，三个，或者多个，甚至一个序列)
 // 比如： 给定一个数字序列和一个target，找到序列中满足 a+b=target 的两个元素
+// 心得：
+// * 对于Triple的数组查询来说，双指针算法的优势就是将O(n^3)简化到O(n^2)
 package two_pointers
 
 import (
@@ -199,4 +201,43 @@ func TestTripletSumCloseToTarget(t *testing.T) {
 	fmt.Println(TripletSumCloseToTarget([]int{-2, 0, 1, 2}, 2))  // [-2 1 2]
 	fmt.Println(TripletSumCloseToTarget([]int{-3, -1, 1, 2}, 1)) // [-3 1 2]
 	fmt.Println(TripletSumCloseToTarget([]int{1, 0, 1, 1}, 100)) // [1 1 1]
+}
+
+// TripletsWithSmallerSum
+func TripletsWithSmallerSum(arr []int, target int) int {
+	result := 0
+
+	sort.Slice(arr, func(i, j int) bool {
+		return arr[i] < arr[j]
+	})
+
+	for cur, a := range arr {
+		if cur != 0 && arr[cur] == arr[cur-1] {
+			continue
+		}
+		i := cur + 1
+		j := len(arr) - 1
+		for i < j {
+			sumOfThree := arr[i] + arr[j] + a
+			if sumOfThree >= target {
+				j--
+				for i < j && arr[j] == arr[j+1] {
+					j--
+				}
+				continue
+			}
+			result += j - i
+			i++
+			for i < j && arr[i] == arr[i-1] {
+				i++
+			}
+		}
+	}
+
+	return result
+}
+
+func TestTripletsWithSmallerSum(t *testing.T) {
+	fmt.Println(TripletsWithSmallerSum([]int{-1, 0, 2, 3}, 3))    // 2
+	fmt.Println(TripletsWithSmallerSum([]int{-1, 4, 2, 1, 3}, 5)) // 4
 }
