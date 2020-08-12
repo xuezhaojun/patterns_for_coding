@@ -106,6 +106,7 @@ func TestSquaringSortedArray(t *testing.T) {
 // 同一个题见leetcode https://leetcode-cn.com/problems/3sum/submissions/
 // 再次做时间从 375ms 提高到了 40ms，而且代码量也减少了
 // 本题关键是如何做到准确的去重复
+// 还有就是i，j是可以同时增减的（按照题目的要求）
 func TripletSumToZero(arr []int) [][]int {
 	result := [][]int{}
 
@@ -120,21 +121,20 @@ func TripletSumToZero(arr []int) [][]int {
 		i := cur + 1
 		j := len(arr) - 1
 		for i < j {
-			if arr[i]+arr[j] < -a {
-				i++
-				for i < j && arr[i] == arr[i-1] {
-					i++
-				}
-			} else if arr[i]+arr[j] > -a {
-				j--
-				for i < j && arr[j] == arr[j+1] {
-					j--
-				}
-			} else {
+			if arr[i]+arr[j] == -a {
 				result = append(result, []int{a, arr[i], arr[j]})
 				i++
 				for i < j && arr[i] == arr[i-1] {
 					i++
+				}
+			} else {
+				i++
+				for i < j && arr[i] == arr[i-1] {
+					i++
+				}
+				j--
+				for i < j && arr[j] == arr[j+1] {
+					j--
 				}
 			}
 		}
