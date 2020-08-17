@@ -241,3 +241,36 @@ func TestTripletsWithSmallerSum(t *testing.T) {
 	fmt.Println(TripletsWithSmallerSum([]int{-1, 0, 2, 3}, 3))    // 2
 	fmt.Println(TripletsWithSmallerSum([]int{-1, 4, 2, 1, 3}, 5)) // 4
 }
+
+// Subarrays With Product Less than a Target
+// 奇怪的是，本题更倾向于一个slice windows的题型，而不是two points的题型
+// 也可以认为 slice windows也就是two points的一种变式
+func SubarraysWithProductLessThanATarget(array []int, target int) [][]int {
+	result := [][]int{}
+	left := 0
+	product := 1
+	for right := range array {
+		product *= array[right]
+
+		for product >= target && left < len(array) {
+			product /= array[left]
+			left++
+		}
+
+		sub := []int{}
+		for i := right; i >= left; i-- {
+			newSub := make([]int, len(sub))
+			copy(newSub, sub)
+			newSub = append(newSub, array[i])
+			result = append(result, newSub)
+			sub = newSub
+		}
+
+	}
+	return result
+}
+
+func TestSubarraysWithProductLessThanATarget(t *testing.T) {
+	fmt.Println(SubarraysWithProductLessThanATarget([]int{2, 5, 3, 10}, 30)) // [[2], [5], [2, 5], [3], [5, 3], [10]]
+	fmt.Println(SubarraysWithProductLessThanATarget([]int{8, 2, 6, 5}, 50))  // [[8], [2], [8, 2], [6], [2, 6], [5], [6, 5]]
+}
