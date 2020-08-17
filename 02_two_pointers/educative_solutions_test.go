@@ -274,3 +274,42 @@ func TestSubarraysWithProductLessThanATarget(t *testing.T) {
 	fmt.Println(SubarraysWithProductLessThanATarget([]int{2, 5, 3, 10}, 30)) // [[2], [5], [2, 5], [3], [5, 3], [10]]
 	fmt.Println(SubarraysWithProductLessThanATarget([]int{8, 2, 6, 5}, 50))  // [[8], [2], [8, 2], [6], [2, 6], [5], [6, 5]]
 }
+
+// Dutch National Flag Problem
+func DutchNationalFlagProblem(array []int) {
+	low, cur, high := 0, 0, len(array)-1
+
+	for cur < high {
+		switch array[cur] {
+		case 0:
+			if cur == low {
+				cur++
+			}
+			for array[low] == 0 {
+				low += 1
+				continue
+			}
+			array[low], array[cur] = array[cur], array[low]
+		case 2:
+			for array[high] == 2 {
+				high--
+				continue
+			}
+			array[high], array[cur] = array[cur], array[high]
+		case 1:
+			cur++
+		}
+	}
+
+	return
+}
+
+func TestDutchNationalFlagProblem(t *testing.T) {
+	array := []int{1, 0, 2, 1, 0}
+	DutchNationalFlagProblem(array)
+	fmt.Println(array) // 0 0 1 1 2
+
+	array2 := []int{2, 2, 0, 1, 2, 0}
+	DutchNationalFlagProblem(array2)
+	fmt.Println(array2) // 0 0 1 2 2 2
+}
