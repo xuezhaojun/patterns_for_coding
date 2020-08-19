@@ -368,3 +368,122 @@ func QuadrupleSumToTarget(arr []int, target int) [][]int {
 func TestQuadrupleSumToTarget(t *testing.T) {
 	fmt.Println(QuadrupleSumToTarget([]int{1, 0, -1, 0, -2, 2}, 0)) // [-1,  0, 0, 1],[-2, -1, 1, 2],[-2,  0, 0, 2]
 }
+
+// backspaceCompare
+// 比较含有退格字符的两个字符串
+// leetcode 对应题： https://leetcode-cn.com/problems/backspace-string-compare/
+func back(str string) string {
+	arr := []byte(str)
+	n, cur := 0, 0
+	for cur < len(arr) {
+		if arr[cur] == '#' {
+			if n > 0 {
+				n--
+			}
+			cur++
+			continue
+		}
+		if n == cur {
+			n++
+			cur++
+			continue
+		}
+		arr[n] = arr[cur]
+		n++
+		cur++
+	}
+	return string(arr[:n])
+}
+func backspaceCompare(S string, T string) bool {
+	return back(S) == back(T)
+}
+
+func TestBackSpaceCompare(t *testing.T) {
+	fmt.Println(backspaceCompare("xy#z", "xzz#")) // true
+	fmt.Println(backspaceCompare("xy#z", "xyz#")) // false
+	fmt.Println(backspaceCompare("x##z", "x#z#")) // false
+}
+
+// Minimum Window Sort
+// O(n*log^n)
+func MinimumWindowSort1(nums []int) int {
+	sortedNums := make([]int, len(nums))
+	copy(sortedNums, nums)
+	sort.Slice(sortedNums, func(i, j int) bool {
+		return sortedNums[i] < sortedNums[j]
+	})
+
+	i, j := 0, len(nums)-1
+	for i < len(nums)-1 {
+		if sortedNums[i] != nums[i] {
+			break
+		}
+		i++
+	}
+
+	for j > i {
+		if sortedNums[j] != nums[j] {
+			break
+		}
+		j--
+	}
+
+	if i == j {
+		return 0
+	}
+
+	return j - i + 1
+}
+
+// O(n)
+// 这道题我学到一个非常重要的算法思想： 最终的成果可以是一步一步叠加计算而来的
+// 本题中，一开始的过程只是得到的最终结果的一个子串，但是基于这个子串不断扩展expand，最终可以得到正确的结果
+func MinimumWindowSort2(nums []int) int {
+	low, high := 0, len(nums)-1
+	for low < len(nums)-1 && nums[low] <= nums[low+1] {
+		low++
+	}
+
+	if low == len(nums)-1 {
+		return 0
+	}
+
+	for high > 0 && nums[high] >= nums[high-1] {
+		high -= 1
+	}
+
+	// find max and min
+	min := math.MaxInt64
+	max := math.MinInt64
+
+	for k := low; k <= high; k++ {
+		if nums[k] > max {
+			max = nums[k]
+		}
+		if nums[k] < min {
+			min = nums[k]
+		}
+	}
+
+	for low > 0 && nums[low-1] > min {
+		low -= 1
+	}
+
+	for high < len(nums)-1 && nums[high+1] < max {
+		high += 1
+	}
+
+	return high - low + 1
+}
+
+func TestMinimumWindowSort(t *testing.T) {
+	fmt.Println(MinimumWindowSort1([]int{1, 2, 5, 3, 7, 10, 9, 12})) // 5
+	fmt.Println(MinimumWindowSort1([]int{1, 3, 2, 0, -1, 7, 10}))    // 5
+	fmt.Println(MinimumWindowSort1([]int{1, 2, 3}))                  // 0
+	fmt.Println(MinimumWindowSort1([]int{3, 2, 1}))                  // 3
+
+	fmt.Println(MinimumWindowSort2([]int{1, 2, 5, 3, 7, 10, 9, 12})) // 5
+	fmt.Println(MinimumWindowSort2([]int{1, 3, 2, 0, -1, 7, 10}))    // 5
+	fmt.Println(MinimumWindowSort2([]int{1, 2, 3}))                  // 0
+	fmt.Println(MinimumWindowSort2([]int{3, 2, 1}))                  // 3
+}
