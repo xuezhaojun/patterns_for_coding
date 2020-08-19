@@ -313,3 +313,58 @@ func TestDutchNationalFlagProblem(t *testing.T) {
 	DutchNationalFlagProblem(array2)
 	fmt.Println(array2) // 0 0 1 2 2 2
 }
+
+// QuadrupleSumToTarget
+// 四数之和
+// leetcode 相同题：https://leetcode-cn.com/problems/4sum/
+// 需要注意的是对于相同a，b，i，j 的去重
+// i，j 去重需要考虑，i 始终要满足小于 j ： [0,0,0,0],0 的测试用例
+func QuadrupleSumToTarget(arr []int, target int) [][]int {
+	sort.Slice(arr, func(i, j int) bool {
+		return arr[i] < arr[j]
+	})
+
+	result := [][]int{}
+	for a := range arr {
+		if a != 0 && arr[a] == arr[a-1] {
+			continue
+		}
+		for b := a + 1; b < len(arr); b++ {
+			if b != a+1 && arr[b] == arr[b-1] {
+				continue
+			}
+			i := b + 1
+			j := len(arr) - 1
+			for i < j {
+				sum := arr[a] + arr[b] + arr[i] + arr[j]
+				switch {
+				case sum > target:
+					j--
+					for arr[j] == arr[j+1] && i < j {
+						j--
+					}
+				case sum < target:
+					i++
+					for arr[i] == arr[i-1] && i < j {
+						i++
+					}
+				default:
+					result = append(result, []int{arr[a], arr[b], arr[i], arr[j]})
+					i++
+					for arr[i] == arr[i-1] && i < j {
+						i++
+					}
+					j--
+					for arr[j] == arr[j+1] && i < j {
+						j--
+					}
+				}
+			}
+		}
+	}
+	return result
+}
+
+func TestQuadrupleSumToTarget(t *testing.T) {
+	fmt.Println(QuadrupleSumToTarget([]int{1, 0, -1, 0, -2, 2}, 0)) // [-1,  0, 0, 1],[-2, -1, 1, 2],[-2,  0, 0, 2]
+}
