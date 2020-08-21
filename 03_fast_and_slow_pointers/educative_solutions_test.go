@@ -141,7 +141,10 @@ func isHappy(num int) bool {
 }
 
 // 此处可以学到的思想
+// 这个关于时间的预估非常有意思，可以看leetcode的官方解法的说明
 func isHappyLessSpace(num int) bool {
+	// getNext算法的时间复杂度为O(log^n)
+	// 开10的方
 	getNext := func(n int) int {
 		result := 0
 		for n != 0 {
@@ -168,4 +171,20 @@ func isHappyLessSpace(num int) bool {
 
 func TestIsHappy(t *testing.T) {
 	fmt.Println(isHappy(2))
+}
+
+// findMiddle
+// 找到链表的中间位置
+func findMiddle(head *ListNode) *ListNode {
+	if head == nil {
+		return nil
+	}
+
+	fast, slow := head, head
+	for fast != nil && fast.Next != nil {
+		slow = slow.Next
+		fast = fast.Next.Next
+	}
+
+	return slow
 }
