@@ -1,6 +1,13 @@
 // 快慢指针算法， 也常常被成为 Hare & Tortoise algorithm 龟兔算法，在处理环形的链表和数组的时候，往往很有效果
 // 由于两个指针移动速度一快一慢，如果linkedlist是环形的，那么最终fast必然会catch到slow
+// 龟兔算法的使用场景：
+// * 判断是否成环（以时间换空间的方式，如果使用空间就需要使用map来缓存所有已经出现过的结果）
 package fast_and_slow_pointers
+
+import (
+	"fmt"
+	"testing"
+)
 
 type ListNode struct {
 	Val  int
@@ -96,4 +103,69 @@ func detectCycleStandard(head *ListNode) *ListNode {
 	}
 
 	return pointer1
+}
+
+// Happy number
+// leetcode传送门 https://leetcode-cn.com/problems/happy-number/submissions/
+// 直接使用缓存的方式，将所有的结果缓存下来，一旦出现重复就返回false
+// 这种方法可以通过测试，但是存在内存占用很大的问题： 时间100% 空间7%
+func isHappy(num int) bool {
+	// resultSet 缓存了所有出现过的数字的结果
+	resultSet := make(map[int]int)
+
+	getNext := func(n int) (bool, int) {
+		no := n
+		if result, ok := resultSet[n]; ok {
+			return true, result
+		}
+		result := 0
+		for n != 0 {
+			c := n % 10
+			result += c * c
+			n = n / 10
+		}
+		resultSet[no] = result
+		return false, result
+	}
+
+	for {
+		exist, next := getNext(num)
+		if exist {
+			return false
+		}
+		if next == 1 {
+			return true
+		}
+		num = next
+	}
+}
+
+// 此处可以学到的思想
+func isHappyLessSpace(num int) bool {
+	getNext := func(n int) int {
+		result := 0
+		for n != 0 {
+			c := n % 10
+			result += c * c
+			n = n / 10
+		}
+		return result
+	}
+
+	slow, fast := num, num
+
+	for {
+		slow = getNext(slow)
+		fast = getNext(getNext(fast))
+		if fast == 1 {
+			return true
+		}
+		if slow == fast {
+			return false
+		}
+	}
+}
+
+func TestIsHappy(t *testing.T) {
+	fmt.Println(isHappy(2))
 }
