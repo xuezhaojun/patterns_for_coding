@@ -188,3 +188,47 @@ func findMiddle(head *ListNode) *ListNode {
 
 	return slow
 }
+
+// isPalindrome
+// leetcode : https://leetcode-cn.com/problems/palindrome-linked-list/
+// 判断一个链表是否回文链表
+// 这个题需要破坏原来的链表结构，本答案中最后并没有执行链表的恢复，但是实际中使用中，需要将这个链表保持原来的结构，则需要在比较中再次执行恢复
+// 时间要求：O(n)
+// 空间要求：O(1)
+func isPalindrome(head *ListNode) bool {
+	if head == nil {
+		return true
+	}
+
+	slow, fast := head, head
+	// find middle
+	for fast != nil && fast.Next != nil {
+		slow = slow.Next
+		fast = fast.Next.Next
+	}
+
+	// reverse nodes after slow(include slow)
+	// 这个部分不确定是不是最简单的写法
+	last := slow
+	cur := slow.Next
+	for cur != nil {
+		next := cur.Next
+		cur.Next = last
+		last = cur
+		cur = next
+	}
+
+	p1, p2 := head, last
+
+	for {
+		if p1.Val != p2.Val {
+			return false
+		}
+		p1 = p1.Next
+		p2 = p2.Next
+		if p2 == slow {
+			break
+		}
+	}
+	return true
+}
