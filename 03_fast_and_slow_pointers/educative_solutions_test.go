@@ -208,7 +208,6 @@ func isPalindrome(head *ListNode) bool {
 	}
 
 	// reverse nodes after slow(include slow)
-	// 这个部分不确定是不是最简单的写法
 	last := slow
 	cur := slow.Next
 	for cur != nil {
@@ -224,11 +223,15 @@ func isPalindrome(head *ListNode) bool {
 		if p1.Val != p2.Val {
 			return false
 		}
-		p1 = p1.Next
-		p2 = p2.Next
+
+		// 这个在很多官方的解法中，使用的事p1/p2是否未nil
+		// 如果未nil，则表示比完了, 但是对应我的reverse，这个p2==slow更好理解
 		if p2 == slow {
 			break
 		}
+
+		p1 = p1.Next
+		p2 = p2.Next
 	}
 	return true
 }
