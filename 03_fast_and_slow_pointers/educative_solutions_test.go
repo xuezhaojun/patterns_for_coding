@@ -284,6 +284,7 @@ func TestRearrangeALinkedlist(t *testing.T) {
 // 如果通过map记录遍历结果，那么arr中的每一个元素只需要遍历一次，时间复杂度O(n)，但是空间复杂度O(1)
 // 本题包含了空间时间互换的思维
 func circularArrayLoop(nums []int) bool {
+	// 这个算法中最重要的部分，就是这个数组中index的“左右横跳”
 	next := func(curIndex, add int, positive bool) (success bool, nextIndex int) {
 		// 在 direction 不同的情况下，直接返回无next，不成同向环
 		if (add > 0 && !positive) || (add < 0 && positive) {
