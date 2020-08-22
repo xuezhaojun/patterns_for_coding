@@ -276,3 +276,59 @@ func TestRearrangeALinkedlist(t *testing.T) {
 	helper.PrintLinkedList(RearrangeALinkedlist(helper.MakeLinkedList([]int{2, 4, 6, 8, 10, 12}))) // 2，12，4，10，6，8
 	helper.PrintLinkedList(RearrangeALinkedlist(helper.MakeLinkedList([]int{2, 4, 6, 8, 10})))     // 2，10，4，8，6
 }
+
+// cycle in a circular array
+// leetcode相同题目： https://leetcode-cn.com/problems/circular-array-loop/
+// 本题在educative上的解释我觉得更加合理：
+// 如果不记录遍历结果，那么就需要对每一个起点开始进行一次寻环算法，那么就需要O(n^2)的时间，需要O(1)的空间
+// 如果通过map记录遍历结果，那么arr中的每一个元素只需要遍历一次，时间复杂度O(n)，但是空间复杂度O(1)
+// 本题包含了空间时间互换的思维
+func circularArrayLoop(nums []int) bool {
+	next := func(curIndex, add int, positive bool) (success bool, nextIndex int) {
+		// 在 direction 不同的情况下，直接返回无next，不成同向环
+		if (add > 0 && !positive) || (add < 0 && positive) {
+			return false, -1
+		}
+		// 此处应该是我想错了，不需要减1
+		nextIndex = ((curIndex+add)%len(nums) + len(nums)) % len(nums) // wrap the negative situdation
+		// 如果环长度小于1
+		if curIndex == nextIndex {
+			return false, -1
+		}
+		return true, nextIndex
+	}
+	// 以下算法中，缓存了每次的查询结果
+	for index, num := range nums {
+		slow, fast := index, index
+		positive := num > 0
+		for {
+			// add 1 to slow
+			var ok bool
+			ok, slow = next(slow, nums[slow], positive)
+			if !ok {
+				break
+			}
+			// add 2 to fast
+			ok, fast = next(fast, nums[fast], positive)
+			if !ok {
+				break
+			}
+			ok, fast = next(fast, nums[fast], positive)
+			if !ok {
+				break
+			}
+			// if fast == slow means there is a loop
+			if fast == slow {
+				// 成环
+				return true
+			}
+		}
+	}
+
+	return false
+}
+
+func TestCircularArrayLoop(t *testing.T) {
+	fmt.Println(circularArrayLoop([]int{1, 2, -1, 2, 2})) // True
+	fmt.Println(circularArrayLoop([]int{2, 2, -2, 2}))    // False
+}
