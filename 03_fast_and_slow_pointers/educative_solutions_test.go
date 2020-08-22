@@ -2,22 +2,19 @@
 // 由于两个指针移动速度一快一慢，如果linkedlist是环形的，那么最终fast必然会catch到slow
 // 龟兔算法的使用场景：
 // * 判断是否成环（以时间换空间的方式，如果使用空间就需要使用map来缓存所有已经出现过的结果）
+// * 处理链表问题
 package fast_and_slow_pointers
 
 import (
 	"fmt"
+	"patterns_for_coding_questions_in_golang/helper"
 	"testing"
 )
-
-type ListNode struct {
-	Val  int
-	Next *ListNode
-}
 
 // 其中最简单的一个例子：
 // 找到一个linkedList中是否存在环
 // 对应leetcode中的题目： https://leetcode-cn.com/problems/linked-list-cycle/
-func hasCycle(head *ListNode) bool {
+func hasCycle(head *helper.ListNode) bool {
 	if head == nil {
 		return false
 	}
@@ -41,13 +38,13 @@ func hasCycle(head *ListNode) bool {
 // 如果 fast 的下一个等于nil，或者下下一个等于nil，说明无环
 // 如果 fast 的下一个或者下下一个等于 end，则当前节点为head
 // 这个是我自己的算法，但是用到了额外的空间O(1),同时破坏了原来的数据结构
-func detectCycle(head *ListNode) *ListNode {
+func detectCycle(head *helper.ListNode) *helper.ListNode {
 	if head == nil {
 		return head
 	}
 
 	slow, fast := head, head
-	end := &ListNode{}
+	end := &helper.ListNode{}
 
 	for fast.Next != nil || fast.Next.Next != nil {
 		if fast.Next == end {
@@ -73,7 +70,7 @@ func detectCycle(head *ListNode) *ListNode {
 // 2. 计算得出cycle的长度
 // 3. 让两个pointer回到起点，其中一个pointer先走一个cycle的长度
 // 4. 然后两个pointer一起走，最终meet在入口处
-func detectCycleStandard(head *ListNode) *ListNode {
+func detectCycleStandard(head *helper.ListNode) *helper.ListNode {
 	if head == nil {
 		return head
 	}
@@ -175,7 +172,7 @@ func TestIsHappy(t *testing.T) {
 
 // findMiddle
 // 找到链表的中间位置
-func findMiddle(head *ListNode) *ListNode {
+func findMiddle(head *helper.ListNode) *helper.ListNode {
 	if head == nil {
 		return nil
 	}
@@ -195,7 +192,7 @@ func findMiddle(head *ListNode) *ListNode {
 // 这个题需要破坏原来的链表结构，本答案中最后并没有执行链表的恢复，但是实际中使用中，需要将这个链表保持原来的结构，则需要在比较中再次执行恢复
 // 时间要求：O(n)
 // 空间要求：O(1)
-func isPalindrome(head *ListNode) bool {
+func isPalindrome(head *helper.ListNode) bool {
 	if head == nil {
 		return true
 	}
@@ -234,4 +231,48 @@ func isPalindrome(head *ListNode) bool {
 		p2 = p2.Next
 	}
 	return true
+}
+
+// Rerange a linkedList
+func RearrangeALinkedlist(head *helper.ListNode) *helper.ListNode {
+	if head == nil {
+		return head
+	}
+
+	// find middle
+	slow, fast := head, head
+	for fast != nil && fast.Next != nil {
+		slow = slow.Next
+		fast = fast.Next.Next
+	}
+
+	// reverse
+	last := slow
+	cur := slow.Next
+	slow.Next = nil
+	for cur != nil {
+		next := cur.Next
+		cur.Next = last
+		last = cur
+		cur = next
+	}
+
+	// migrate
+	p1 := head
+	p2 := last
+	for p2.Next != nil {
+		nextOfP1 := p1.Next
+		nextOfP2 := p2.Next
+		p1.Next = p2
+		p1 = nextOfP1
+		p2.Next = p1
+		p2 = nextOfP2
+	}
+
+	return head
+}
+
+func TestRearrangeALinkedlist(t *testing.T) {
+	helper.PrintLinkedList(RearrangeALinkedlist(helper.MakeLinkedList([]int{2, 4, 6, 8, 10, 12}))) // 2，12，4，10，6，8
+	helper.PrintLinkedList(RearrangeALinkedlist(helper.MakeLinkedList([]int{2, 4, 6, 8, 10})))     // 2，10，4，8，6
 }
