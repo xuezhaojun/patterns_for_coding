@@ -1,8 +1,3 @@
-// 快慢指针算法， 也常常被成为 Hare & Tortoise algorithm 龟兔算法，在处理环形的链表和数组的时候，往往很有效果
-// 由于两个指针移动速度一快一慢，如果linkedlist是环形的，那么最终fast必然会catch到slow
-// 龟兔算法的使用场景：
-// * 判断是否成环（以时间换空间的方式，如果使用空间就需要使用map来缓存所有已经出现过的结果）
-// * 处理链表问题
 package fast_and_slow_pointers
 
 import (

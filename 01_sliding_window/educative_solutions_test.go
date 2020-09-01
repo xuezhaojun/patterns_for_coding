@@ -1,5 +1,3 @@
-// 解题心得：
-// * 求一个序列中满足某些条件的字串，都尝试滑动窗口来解决
 package sliding_window
 
 import (
