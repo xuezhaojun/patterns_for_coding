@@ -23,3 +23,8 @@ func kthToLast(head *ListNode, k int) int {
 	}
 	return slow.Val
 }
+
+// https://leetcode-cn.com/problems/find-the-duplicate-number/
+func findDuplicate(nums []int) int {
+	return 0
+}
