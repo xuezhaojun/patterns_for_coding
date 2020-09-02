@@ -132,7 +132,79 @@ func TestInsertIntervals(t *testing.T) {
 // 区间列表的交集
 // leetcode: https://leetcode-cn.com/problems/interval-list-intersections/
 // 两个列表都是【已排序的】
+// 时间70% 空间7%
 func intervalIntersection(A [][]int, B [][]int) [][]int {
 	result := [][]int{}
+	var i, j int
+	for i < len(A) && j < len(B) {
+		intervalA := A[i]
+		intervalB := B[j]
+		if overlap(intervalA[0], intervalA[1], intervalB[0], intervalB[1]) {
+			start, end := getintersection(intervalA[0], intervalA[1], intervalB[0], intervalB[1])
+			result = append(result, []int{start, end})
+		}
+		if intervalA[1] <= intervalB[1] {
+			i++
+		} else {
+			j++
+		}
+	}
 	return result
+}
+
+// 方案2为优化，选择了更简洁的方式来表达intersection这个状态
+// 时间复杂度可以优化倒 93%
+func intervalIntersection2(A [][]int, B [][]int) [][]int {
+	result := [][]int{}
+	var i, j int
+	for i < len(A) && j < len(B) {
+		a := A[i]
+		b := B[j]
+
+		// 【重要】如果判断两个区间是否overlap的快捷思路
+		var lo, hi int
+		if a[0] < b[0] {
+			lo = b[0]
+		} else {
+			lo = a[0]
+		}
+		if a[1] > b[1] {
+			hi = b[1]
+		} else {
+			hi = a[1]
+		}
+		if lo <= hi {
+			result = append(result, []int{lo, hi})
+		}
+
+		if a[1] <= b[1] {
+			i++
+		} else {
+			j++
+		}
+	}
+	return result
+}
+
+func overlap(start1, end1, start2, end2 int) bool {
+	if (start1 <= start2 && start2 <= end1) || (start2 <= start1 && start1 <= end2) {
+		return true
+	}
+	return false
+}
+
+func getintersection(start1, end1, start2, end2 int) (start, end int) {
+	if start1 < start2 {
+		start = start2
+	} else {
+		start = start1
+	}
+
+	if end1 < end2 {
+		end = end1
+	} else {
+		end = end2
+	}
+
+	return
 }
