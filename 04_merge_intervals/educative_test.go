@@ -208,3 +208,30 @@ func getintersection(start1, end1, start2, end2 int) (start, end int) {
 
 	return
 }
+
+// Conflicting Appointments
+// 这个题按照merge intervals的模式可以快速完成，主要在如何判断两个interval是否覆盖的问题上
+func AttendToAllAppointments(intervals [][]int) bool {
+	// 首先讲intervals的按照开始时间排序
+	sort.Slice(intervals, func(i, j int) bool {
+		return intervals[i][0] < intervals[j][0]
+	})
+
+	if len(intervals) == 1 {
+		return true
+	}
+
+	for i := 1; i < len(intervals); i++ {
+		if intervals[i][0] < intervals[i-1][1] {
+			return false
+		}
+	}
+
+	return true
+}
+
+func TestAttendToAllAppointments(t *testing.T) {
+	t.Log(AttendToAllAppointments([][]int{{1, 4}, {2, 5}, {7, 9}}))  // false
+	t.Log(AttendToAllAppointments([][]int{{6, 7}, {2, 4}, {8, 12}})) // true
+	t.Log(AttendToAllAppointments([][]int{{4, 5}, {2, 3}, {3, 6}}))  // false
+}
