@@ -235,3 +235,85 @@ func TestAttendToAllAppointments(t *testing.T) {
 	t.Log(AttendToAllAppointments([][]int{{6, 7}, {2, 4}, {8, 12}})) // true
 	t.Log(AttendToAllAppointments([][]int{{4, 5}, {2, 3}, {3, 6}}))  // false
 }
+
+// Minimum Meeting Rooms 最小数量的会议间
+func MinimumMeetingRooms(meetings [][]int) int {
+	// 对meetings进行排序
+	sort.Slice(meetings, func(i, j int) bool {
+		return meetings[i][0] < meetings[j][0]
+	})
+
+	// 统计有多少交集
+	maxRooms := 1
+	curRooms := 1
+	curMeeting := meetings[0]
+	for i := 1; i < len(meetings); i++ {
+		if curMeeting[1] > meetings[i][0] {
+			curRooms++
+			if curRooms > maxRooms {
+				maxRooms = curRooms
+			}
+			curMeeting = []int{max(curMeeting[0], meetings[i][0]), min(curMeeting[1], meetings[i][1])}
+		} else {
+			curRooms = 1
+			curMeeting = meetings[i]
+		}
+	}
+
+	return maxRooms
+}
+
+func max(num1, num2 int) int {
+	if num1 > num2 {
+		return num1
+	}
+	return num2
+}
+
+func min(num1, num2 int) int {
+	if num1 < num2 {
+		return num1
+	}
+	return num2
+}
+
+func TestMinimunMeetingRooms(t *testing.T) {
+	t.Log(MinimumMeetingRooms([][]int{{1, 4}, {2, 5}, {7, 9}}))         // 2
+	t.Log(MinimumMeetingRooms([][]int{{6, 7}, {2, 4}, {8, 12}}))        // 1
+	t.Log(MinimumMeetingRooms([][]int{{1, 4}, {2, 3}, {3, 6}}))         // 2
+	t.Log(MinimumMeetingRooms([][]int{{4, 5}, {2, 3}, {2, 4}, {3, 5}})) // 2
+}
+
+// Maximum CPU Load
+// max cpu load 基本是上一个题的直观改变，只要把room一次加一个改为一次加cpu load即可
+func MaximumCPULoad(jobs [][]int) (maxcpuload int) {
+	// 对jobs进行排序
+	sort.Slice(jobs, func(i, j int) bool {
+		return jobs[i][0] < jobs[j][0]
+	})
+
+	curJob := jobs[0]
+	curLoad := jobs[0][2]
+
+	for i := 1; i < len(jobs); i++ {
+		if curJob[1] > jobs[i][0] {
+			curLoad += jobs[i][2]
+			curJob = []int{max(curJob[0], jobs[i][0]), min(curJob[1], jobs[i][1]), curLoad}
+		} else {
+			curJob = jobs[i]
+			curLoad = jobs[i][2]
+		}
+
+		if curLoad > maxcpuload {
+			maxcpuload = curLoad
+		}
+	}
+
+	return
+}
+
+func TestMaximumCPULoad(t *testing.T) {
+	t.Log(MaximumCPULoad([][]int{{1, 4, 3}, {2, 5, 4}, {7, 9, 6}}))     // 7
+	t.Log(MaximumCPULoad([][]int{{6, 7, 10}, {2, 4, 11}, {8, 12, 15}})) // 15
+	t.Log(MaximumCPULoad([][]int{{1, 4, 2}, {2, 4, 1}, {3, 6, 5}}))     // 8
+}
