@@ -317,3 +317,33 @@ func TestMaximumCPULoad(t *testing.T) {
 	t.Log(MaximumCPULoad([][]int{{6, 7, 10}, {2, 4, 11}, {8, 12, 15}})) // 15
 	t.Log(MaximumCPULoad([][]int{{1, 4, 2}, {2, 4, 1}, {3, 6, 5}}))     // 8
 }
+
+// Employee Free Time
+// 员工空闲时间
+// 本题和上面两个题一样，只不过合并方式变为的 并集合并； 判断方式编程 非覆盖判断
+func EmployeeFreeTime(workingHours [][]int) [][]int {
+	result := [][]int{}
+
+	// 首先对工作时间按照开始时间进行排序
+	sort.Slice(workingHours, func(i, j int) bool {
+		return workingHours[i][0] < workingHours[j][0]
+	})
+
+	cur := workingHours[0]
+	for i := 1; i < len(workingHours); i++ {
+		if cur[1] >= workingHours[i][0] {
+			cur = []int{cur[0], workingHours[i][1]}
+		} else {
+			result = append(result, []int{cur[1], workingHours[i][0]})
+			cur = workingHours[i]
+		}
+	}
+
+	return result
+}
+
+func TestEmployeeFreeTime(t *testing.T) {
+	t.Log(EmployeeFreeTime([][]int{{1, 3}, {5, 6}, {2, 3}, {6, 8}}))  // [3,5]
+	t.Log(EmployeeFreeTime([][]int{{1, 3}, {9, 12}, {2, 4}, {6, 8}})) // [4,6],[8,9]
+	t.Log(EmployeeFreeTime([][]int{{1, 3}, {2, 4}, {3, 5}, {7, 9}}))  // [5,7]
+}
