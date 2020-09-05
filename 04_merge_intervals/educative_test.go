@@ -347,3 +347,6 @@ func TestEmployeeFreeTime(t *testing.T) {
 	t.Log(EmployeeFreeTime([][]int{{1, 3}, {9, 12}, {2, 4}, {6, 8}})) // [4,6],[8,9]
 	t.Log(EmployeeFreeTime([][]int{{1, 3}, {2, 4}, {3, 5}, {7, 9}}))  // [5,7]
 }
+
+// 这个单元的题目，educative的题解都引入了minheap来解决，用来维护一个【重叠区间】的数量
+// 判断标准，如果一个区间的start小于heap中最小的end，那么则说明会重叠增加
