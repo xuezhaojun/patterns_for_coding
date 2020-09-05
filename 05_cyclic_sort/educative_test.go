@@ -25,3 +25,34 @@ func TestCyclicSort(t *testing.T) {
 	CyclicSort([]int{2, 6, 4, 3, 1, 5})
 	CyclicSort([]int{1, 5, 6, 4, 3, 2})
 }
+
+// Find The Missing Number
+// 关键信息：
+// nums 无序，且对应缺失某一个序列中的num
+// 本题的一个trick，因为nums的数量其实是缺1的，所以对应最后一个数，其实是可以不排的；
+// 但是我这里不考虑空间使用问题，给原来的nums新加一个-1的位置，用这个-1位来表示缺失位
+func FindTheMissingNumber(nums []int) int {
+	nums = append(nums, -1)
+	for i := range nums {
+		for nums[i] != i {
+			expectPos := nums[i]
+			if expectPos == -1 {
+				break
+			}
+			nums[i], nums[expectPos] = nums[expectPos], nums[i]
+		}
+	}
+
+	for i := range nums {
+		if nums[i] == -1 {
+			return i
+		}
+	}
+
+	return -1
+}
+
+func TestFindTheMissingNumber(t *testing.T) {
+	t.Log(FindTheMissingNumber([]int{4, 0, 3, 1}))             // 2
+	t.Log(FindTheMissingNumber([]int{8, 3, 5, 2, 4, 6, 0, 1})) // 7
+}
