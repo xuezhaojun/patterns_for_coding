@@ -121,3 +121,32 @@ func TestFindAllDuplicateNumbers(t *testing.T) {
 	t.Log(FindAllDuplicateNumbers([]int{3, 4, 4, 5, 5}))       // [5,4]
 	t.Log(FindAllDuplicateNumbers([]int{5, 4, 7, 2, 3, 5, 3})) // [3,5]
 }
+
+// Find the Corrupt Pair
+func FindTheCorruptPair(nums []int) []int {
+	result := []int{-1, -1}
+
+	for i := range nums {
+		for nums[i] != i+1 {
+			except := nums[i] - 1
+			if nums[except] == nums[i] {
+				break
+			}
+			nums[i], nums[except] = nums[except], nums[i]
+		}
+	}
+
+	for i := range nums {
+		cur := nums[i]
+		if cur != i+1 {
+			result = []int{cur, i + 1}
+		}
+	}
+
+	return result
+}
+
+func TestFindTheCorruptPair(t *testing.T) {
+	t.Log(FindTheCorruptPair([]int{3, 1, 2, 5, 2}))    // [2, 4]
+	t.Log(FindTheCorruptPair([]int{3, 1, 2, 3, 6, 4})) // [3, 5]
+}
