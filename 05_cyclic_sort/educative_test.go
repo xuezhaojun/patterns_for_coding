@@ -1,6 +1,8 @@
 package cyclic_sort
 
-import "testing"
+import (
+	"testing"
+)
 
 // Cyclic sort
 // 要求是in-place，所以并没有返回
@@ -79,4 +81,43 @@ func TestFindTheDuplicateNumber(t *testing.T) {
 	t.Log(FindTheDuplicateNumber([]int{1, 4, 4, 3, 2}))    // 4
 	t.Log(FindTheDuplicateNumber([]int{2, 1, 3, 3, 5, 4})) // 3
 	t.Log(FindTheDuplicateNumber([]int{2, 4, 1, 4, 4}))    // 4
+}
+
+// Find all Duplicate Numbers
+// 本题要求是不使用任何的，额外空间
+func FindAllDuplicateNumbers(nums []int) []int {
+	result := []int{}
+
+	// 输入的序列还是从1-n中提取的，但是本次只是随机提取的几个数字
+	// one way to sort is as normal, use quick sort build in golang
+	// sort.Slice(nums, func(i, j int) bool {
+	// 	return nums[i] < nums[j]
+	// })
+	// for i := 1; i < len(nums); i++ {
+	// 	if nums[i] == nums[i-1] {
+	// 		result = append(result, nums[i])
+	// 	}
+	// }
+
+	// another way is to use "cyclic sort" way
+	// 注意这个的数列还有另外一个规律，就是虽然数字重复，但是总数不变，也就是多个数，同时少个数
+	// 那么进行cyclic sort 后，谁不再位置上，谁就是重复数
+
+	for i := range nums {
+		for nums[i] != i+1 {
+			expect := nums[i] - 1
+			if nums[expect] == nums[i] {
+				result = append(result, nums[expect])
+				break
+			}
+			nums[i], nums[expect] = nums[expect], nums[i]
+		}
+	}
+
+	return result
+}
+
+func TestFindAllDuplicateNumbers(t *testing.T) {
+	t.Log(FindAllDuplicateNumbers([]int{3, 4, 4, 5, 5}))       // [5,4]
+	t.Log(FindAllDuplicateNumbers([]int{5, 4, 7, 2, 3, 5, 3})) // [3,5]
 }
