@@ -150,3 +150,34 @@ func TestFindTheCorruptPair(t *testing.T) {
 	t.Log(FindTheCorruptPair([]int{3, 1, 2, 5, 2}))    // [2, 4]
 	t.Log(FindTheCorruptPair([]int{3, 1, 2, 3, 6, 4})) // [3, 5]
 }
+
+// Find the Smallest Missing Positive Number
+// 本题建议运行 leetcode 上的类似题，已获取更全的测试集 https://leetcode-cn.com/problems/first-missing-positive
+func FindTheSmallestMissingPositiveNumber(nums []int) int {
+	if len(nums) == 0 {
+		return 1
+	}
+	for i := range nums {
+		for nums[i] > 0 && nums[i] != i+1 && nums[i] <= len(nums)-1 {
+			expect := nums[i] - 1
+			if nums[i] == nums[expect] { // 这里经常忘记考虑
+				break
+			}
+			nums[i], nums[expect] = nums[expect], nums[i]
+		}
+	}
+
+	for i := range nums {
+		if nums[i] != i+1 {
+			return i + 1
+		}
+	}
+
+	return nums[len(nums)-1] + 1
+}
+
+func TestFindTheSmallestMissingPositiveNumber(t *testing.T) {
+	t.Log(FindTheSmallestMissingPositiveNumber([]int{-3, 1, 5, 4, 2})) // 3
+	t.Log(FindTheSmallestMissingPositiveNumber([]int{3, -2, 0, 1, 2})) // 4
+	t.Log(FindTheSmallestMissingPositiveNumber([]int{3, 2, 5, 1}))     // 4
+}
