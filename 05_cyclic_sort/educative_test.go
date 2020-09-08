@@ -181,3 +181,29 @@ func TestFindTheSmallestMissingPositiveNumber(t *testing.T) {
 	t.Log(FindTheSmallestMissingPositiveNumber([]int{3, -2, 0, 1, 2})) // 4
 	t.Log(FindTheSmallestMissingPositiveNumber([]int{3, 2, 5, 1}))     // 4
 }
+
+// Find the First K Missing Positive Numbers (hard)
+// 这个算法的时间复杂度满足预期O(n) 但是空间复杂度不满足O(1)
+func findKthPositive(nums []int, k int) (missingNumber []int) {
+	mapping := make(map[int]int)
+	for _, num := range nums {
+		mapping[num] = 1
+	}
+
+	i := 1
+	for k > 0 {
+		if _, ok := mapping[i]; !ok {
+			missingNumber = append(missingNumber, i)
+			k--
+		}
+		i++
+	}
+
+	return
+}
+
+func TestFindKthPostive(t *testing.T) {
+	t.Log(findKthPositive([]int{3, -1, 4, 5, 5}, 3)) // 1,2,6
+	t.Log(findKthPositive([]int{2, 3, 4}, 3))        // 1,5,6
+	t.Log(findKthPositive([]int{-2, -3, 4}, 2))      // 1,2
+}
