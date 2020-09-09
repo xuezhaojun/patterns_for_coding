@@ -69,3 +69,51 @@ func reverseBetween(head *ListNode, m int, n int) *ListNode {
 
 	return preHead.Next
 }
+
+// Reverse every K-element Sub-list
+// https://leetcode-cn.com/problems/reverse-nodes-in-k-group/
+func reverseKGroup(head *ListNode, k int) *ListNode {
+	preTail := &ListNode{}
+	cur := head
+	headMoved := false
+	for cur != nil {
+		count := k
+
+		var oldTail, oldHead *ListNode
+		var newTail, newHead *ListNode
+		// 找到对应的newHead,和newTail
+		oldHead = cur
+		var pre *ListNode
+		for cur != nil {
+			pre = cur
+			cur = cur.Next
+			count--
+		}
+		oldTail = pre
+
+		if count > 0 {
+			// 进行从 oldHead 到 oldTail 的反转
+			c := oldTail
+			var p *ListNode
+			for c != oldTail.Next {
+				next := c.Next
+				c.Next = p
+				p = c
+				c = next
+			}
+		}
+		newHead = oldHead
+		newTail = oldTail
+
+		// 拼接
+		preTail.Next = newHead
+		preTail = newTail
+
+		// headmove
+		if !headMoved {
+			head = newHead
+			headMoved = true
+		}
+	}
+	return head
+}
