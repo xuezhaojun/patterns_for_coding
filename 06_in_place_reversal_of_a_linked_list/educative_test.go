@@ -148,3 +148,100 @@ func TestReverseKGroup(t *testing.T) {
 	}
 	reverseKGroup(n1, 3)
 }
+
+// Reverse alternating K-element Sub-list
+// 以下算法选取了 educative 上的算法流程; 整体的思路确实更加的清晰一些
+func ReverseAlternateKElements(head *ListNode, k int) {
+	// k = 1的时候相当于无反转
+	if k <= 1 || head == nil {
+		return
+	}
+
+	current := head
+	var previous *ListNode
+
+	for {
+		lastNodeOfPreviousPart := previous // 这里的命名虽然长但是相比之下相当的清楚
+		lastNodeOfSubList := current       // 当前节点的最后一个子节点（反转后）
+		var next *ListNode
+
+		// 进行k个节点的反转
+		i := 0
+		for current != nil && i < k {
+			next = current.Next
+			current.Next = previous
+			previous = current
+			current = next
+			i++
+		}
+
+		// 将当前的sublist 和 preSubList connect
+		if lastNodeOfPreviousPart != nil {
+			lastNodeOfPreviousPart.Next = previous
+		} else {
+			head = previous
+		}
+
+		lastNodeOfSubList.Next = current
+
+		i = 0
+		for current != nil && i < k {
+			previous = current
+			current = current.Next
+			i++
+		}
+
+		if current == nil {
+			break
+		}
+	}
+}
+
+// Rotate List
+// https://leetcode-cn.com/problems/rotate-list/submissions/
+// 同样原地完成， 需要时间O(N)，共遍历两次
+func rotateRight(head *ListNode, k int) *ListNode {
+	if head == nil {
+		return head
+	}
+	// 首先遍历一次链表获取长度
+	cur := head
+	lengthOfList := 0
+	for cur != nil {
+		cur = cur.Next
+		lengthOfList++
+	}
+
+	// 对k进行取模，判断最小需要移动的量
+	k = k % lengthOfList
+	if k == 0 { // 这里稍微有一点点丑，因为下面的算法并不是兼容k=0的情况
+		return head
+	}
+
+	// 进行移动
+	oldHead := head
+	cur = head
+	var pre *ListNode
+	count := 0
+	for {
+		if count == lengthOfList-k {
+			break
+		}
+		pre = cur
+		cur = cur.Next
+		count++
+	}
+
+	// 设定新的首尾
+	head = cur // k = 0 的情况下，cur is nil
+	pre.Next = nil
+
+	// 将后面这个部分接入
+	for cur != nil {
+		pre = cur
+		cur = cur.Next
+	}
+	pre.Next = oldHead
+
+	return head
+}
