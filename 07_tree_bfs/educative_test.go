@@ -83,3 +83,73 @@ func levelOrder2(root *TreeNode) [][]int {
 
 	return result
 }
+
+// Reverse Level Order Traversal
+// https://leetcode-cn.com/problems/binary-tree-level-order-traversal-ii/
+// 这种反向可能一开始想到的就是栈，通过栈来做逆序
+func levelOrderBottom(root *TreeNode) [][]int {
+	l := list.New()
+	if root == nil {
+		return [][]int{}
+	}
+	l.PushBack(root)
+
+	result := [][]int{}
+	for l.Len() != 0 {
+		levelSize := l.Len()
+		curLevel := []int{}
+		for levelSize > 0 {
+			front := l.Front().Value.(*TreeNode)
+			curLevel = append(curLevel, front.Val)
+			if front.Left != nil {
+				l.PushBack(front.Left)
+			}
+			if front.Right != nil {
+				l.PushBack(front.Right)
+			}
+			l.Remove(l.Front())
+			levelSize--
+		}
+		result = append([][]int{curLevel}, result...) // 仅此处修改
+	}
+
+	return result
+}
+
+// Zigzag Traversal
+// https://leetcode-cn.com/problems/binary-tree-zigzag-level-order-traversal/
+// 从zigzag这个题可以看出，curlevel这个概念确实简化了逻辑
+func zigzagLevelOrder(root *TreeNode) [][]int {
+	l := list.New()
+	if root == nil {
+		return [][]int{}
+	}
+	l.PushBack(root)
+
+	result := [][]int{}
+	zigzag := true
+	for l.Len() != 0 {
+		levelSize := l.Len()
+		curLevel := []int{}
+		for levelSize > 0 {
+			front := l.Front().Value.(*TreeNode)
+			if zigzag {
+				curLevel = append(curLevel, front.Val)
+			} else {
+				curLevel = append([]int{front.Val}, curLevel...) // 如果逆序，则直接逆序添加curLevel即可
+			}
+			if front.Left != nil {
+				l.PushBack(front.Left)
+			}
+			if front.Right != nil {
+				l.PushBack(front.Right)
+			}
+			l.Remove(l.Front())
+			levelSize--
+		}
+		zigzag = !zigzag
+		result = append(result, curLevel)
+	}
+
+	return result
+}
