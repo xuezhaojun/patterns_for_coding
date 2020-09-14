@@ -205,6 +205,7 @@ func rotateRight(head *ListNode, k int) *ListNode {
 		return head
 	}
 	// 首先遍历一次链表获取长度
+	// TODO: 优化，再本次遍历中，其实就可以拿到 tailOfList
 	cur := head
 	lengthOfList := 0
 	for cur != nil {
