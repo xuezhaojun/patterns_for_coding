@@ -1,6 +1,8 @@
 // 使用recursion进行遍历，空间复杂度最多为O(H),H是树的深度
 package tree_dfs
 
+import "math"
+
 type TreeNode struct {
 	Val   int
 	Left  *TreeNode
@@ -165,6 +167,35 @@ func depth(root *TreeNode, ans *int) int {
 
 // Path with Maximum Sum
 // https://leetcode-cn.com/problems/binary-tree-maximum-path-sum/
+// 本题为上一个题的延续，但是同时存在难点，比如：
+// 路径的定义改变，可以从任意一个节点出发到任意一个节点（并不一定是leaf开始和结束）原来是统计depth
+// 原来是计算
 func maxPathSum(root *TreeNode) int {
+	// 本题中的一个有趣的点，如何使用匿名函数进行递归
+	maxSum := math.MinInt32
+	var maxGain func(*TreeNode) int
+	maxGain = func(node *TreeNode) int {
+		if node == nil {
+			return 0
+		}
 
+		// 只有子节点贡献值大于0的时候，才会选择子节点
+		leftGain := max(maxGain(node.Left), 0)
+		rightGain := max(maxGain(node.Right), 0)
+
+		priceNewPath := node.Val + leftGain + rightGain
+
+		maxSum = max(maxSum, priceNewPath) // update maxSum
+
+		return node.Val + max(leftGain, rightGain)
+	}
+	maxGain(root)
+	return maxSum
+}
+
+func max(x, y int) int {
+	if x > y {
+		return x
+	}
+	return y
 }
