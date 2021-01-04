@@ -218,3 +218,198 @@ func TestMedianSlidingWindow(t *testing.T) {
 	// result := medianSlidingWindow([]int{1, 1, 1, 1}, 2)
 	t.Log(result)
 }
+
+// Maximize Capital
+// https://leetcode-cn.com/problems/ipo/solution/
+// 本题比较烦的是min-heap和max-heap需要重新定义
+func findMaximizedCapital(k int, W int, Profits []int, Capital []int) int {
+	ch := new(capitalHeap)
+	ph := new(profitHeap)
+
+	// 构成project
+	var projects []project
+	for i := 0; i < len(Profits); i++ {
+		projects = append(projects, project{
+			index:   i,
+			profit:  Profits[i],
+			capital: Capital[i],
+		})
+	}
+
+	// 首先将projects按照capital加入min-heap
+	for _, p := range projects {
+		heap.Push(ch, p)
+	}
+
+	// 取k次
+	for i := 0; i < k; i++ {
+		for {
+			if ch.Len() == 0 {
+				break
+			}
+			minC := (*ch)[0].capital
+			if minC <= W {
+				e := heap.Pop(ch).(project)
+				heap.Push(ph, e)
+			} else {
+				break
+			}
+		}
+		// 取堆顶
+		if ph.Len() == 0 {
+			break
+		}
+		p := (*ph)[0].profit
+		W += p
+		heap.Pop(ph)
+	}
+
+	return W
+}
+
+type project struct {
+	index   int
+	profit  int
+	capital int
+}
+
+type capitalHeap []project // min-heap
+type profitHeap []project  // max-heap
+
+func (h capitalHeap) Len() int {
+	return len(h)
+}
+
+func (h capitalHeap) Less(i, j int) bool {
+	return h[i].capital < h[j].capital
+}
+
+func (h capitalHeap) Swap(i, j int) {
+	h[i], h[j] = h[j], h[i]
+}
+
+func (h *capitalHeap) Push(x interface{}) {
+	*h = append(*h, x.(project))
+}
+
+func (h *capitalHeap) Pop() interface{} {
+	old := *h
+	n := len(old)
+	x := old[n-1]
+	*h = old[0 : n-1]
+	return x
+}
+
+func (h profitHeap) Len() int {
+	return len(h)
+}
+
+func (h profitHeap) Less(i, j int) bool {
+	return h[i].profit > h[j].profit
+}
+
+func (h profitHeap) Swap(i, j int) {
+	h[i], h[j] = h[j], h[i]
+}
+
+func (h *profitHeap) Push(x interface{}) {
+	*h = append(*h, x.(project))
+}
+
+func (h *profitHeap) Pop() interface{} {
+	old := *h
+	n := len(old)
+	x := old[n-1]
+	*h = old[0 : n-1]
+	return x
+}
+
+// Next Interval
+// https://leetcode-cn.com/problems/find-right-interval/
+func findRightInterval(intervals [][]int) []int {
+	// 首先构造两个min-heap
+	startHeap := new(intervalHeap)
+	endHeap := new(intervalHeap)
+	record := make(map[int]int)
+
+	// 填入结果
+	for index, interval := range intervals {
+		start := interval[0]
+		end := interval[1]
+		heap.Push(startHeap, in{
+			index: index,
+			num:   start,
+		})
+		heap.Push(endHeap, in{
+			index: index,
+			num:   end,
+		})
+	}
+
+	for {
+		startMin := (*startHeap)[0]
+		endMin := (*endHeap)[0]
+
+		if endMin.num > startMin.num {
+			heap.Pop(startHeap)
+		} else {
+			record[endMin.index] = startMin.index
+			heap.Pop(endHeap)
+		}
+
+		if startHeap.Len() == 0 || endHeap.Len() == 0 {
+			break
+		}
+	}
+
+	var result []int
+	for index, _ := range intervals {
+		if next, ok := record[index]; ok {
+			result = append(result, next)
+		} else {
+			result = append(result, -1)
+		}
+	}
+
+	return result
+}
+
+type in struct {
+	index int
+	num   int
+}
+
+// intervalHeap is a min-heap
+type intervalHeap []in
+
+func (h intervalHeap) Len() int {
+	return len(h)
+}
+
+func (h intervalHeap) Less(i, j int) bool {
+	return h[i].num < h[j].num
+}
+
+func (h intervalHeap) Swap(i, j int) {
+	h[i], h[j] = h[j], h[i]
+}
+
+func (h *intervalHeap) Push(x interface{}) {
+	*h = append(*h, x.(in))
+}
+
+func (h *intervalHeap) Pop() interface{} {
+	old := *h
+	n := len(old)
+	x := old[n-1]
+	*h = old[0 : n-1]
+	return x
+}
+
+func TestFindRightInterval(t *testing.T) {
+	findRightInterval([][]int{
+		{3, 4},
+		{1, 5},
+		{4, 6},
+	})
+}
