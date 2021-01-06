@@ -162,3 +162,19 @@ func change(s string, index int) string {
 	}
 	return string(newbs)
 }
+
+// Structurally Unique Binary Search Tree
+// https://leetcode-cn.com/problems/unique-binary-search-trees/
+// 这个解题思路和我的思路并不一样，是按照分治递归的方式解决的，而不是BFS的方式
+func numTrees(n int) int {
+	if n <= 1 {
+		return 1
+	}
+	count := 0
+	for i := 1; i <= n; i++ {
+		cL := numTrees(i - 1)
+		cR := numTrees(n - i)
+		count += (cL * cR)
+	}
+	return count
+}
