@@ -130,3 +130,42 @@ func (h *FreHeap) Pop() interface{} {
 func TestTopKFrequent(t *testing.T) {
 	topKFrequent([]int{5, 3, 1, 1, 1, 3, 5, 73, 1}, 3)
 }
+
+// quick select 的方式进行查找
+func findKthLargest(nums []int, k int) int {
+	index := quick_select(nums, 0, len(nums)-1, k-1)
+	return nums[index]
+}
+
+func quick_select(arr []int, start, end int, k int) int {
+	pivot := partition(arr, start, end)
+	switch {
+	case pivot > k:
+		return quick_select(arr, start, pivot-1, k)
+	case pivot < k:
+		return quick_select(arr, pivot+1, end, k)
+	default:
+		return pivot
+	}
+}
+
+func partition(arr []int, start, end int) int {
+	pivot := start
+	index := pivot
+	for i := index; i <= end; i++ {
+		if arr[i] > arr[pivot] {
+			index += 1
+			swap(arr, i, index)
+		}
+	}
+	swap(arr, pivot, index)
+	return index
+}
+
+func swap(arr []int, i, j int) {
+	arr[i], arr[j] = arr[j], arr[i]
+}
+
+func TestFindKthLargest(t *testing.T) {
+	findKthLargest([]int{3, 2, 1, 5, 6, 4}, 2)
+}
