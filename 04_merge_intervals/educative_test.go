@@ -11,49 +11,47 @@ import (
 // 此处的解法是在一开始设想的：这个解法没有考虑倒 [0,0][1,4] 这样特殊的情况（一个区间首尾相同的情况），所以最终是没有通过leetcode的测试(但是可以通过educative的测试)
 // 时间复杂度也是 O(n*lgn)
 func mergeIntervals(intervals [][]int) [][]int {
-	result := [][]int{}
-
-	all := []int{}
-	status := make(map[int]int) // 1: start 2: overlap 3: end
-
-	// init
-	for _, interval := range intervals {
-		all = append(all, interval...)
-		start := interval[0]
-		end := interval[1]
-		if _, ok := status[start]; !ok {
-			status[start] = 1
-		} else {
-			if status[start] != 1 {
-				status[start] = 2
-			}
-		}
-
-		if _, ok := status[end]; !ok {
-			status[end] = 3
-		} else {
-			if status[end] != 3 {
-				status[end] = 2
-			}
-		}
+	if len(intervals) < 2 {
+		return intervals
 	}
 
-	sort.Slice(all, func(i, j int) bool {
-		return all[i] < all[j]
+	// 首先，按照start time对intervals进行排序
+	sort.Slice(intervals, func(i, j int) bool {
+		return intervals[i][0] < intervals[j][0]
 	})
 
-	var start, end int
-	for start <= len(all)-1 {
-		if end == len(all)-1 || (status[all[end]] == 3 && status[all[end+1]] == 1) {
-			result = append(result, []int{
-				all[start], all[end],
-			})
-			end = end + 1
-			start = end
+	// 遍历intervals，合并可以合并的区间
+	result := [][]int{}
+
+	start := intervals[0][0]
+	end := intervals[0][1]
+	for i, interval := range intervals {
+		if i == 0 {
+			continue
 		}
-		end++
+		// 判断是否overlap
+		// interval[0] 即 start
+		// 当前start 小于上一个的end，则执行合并
+		if interval[0] <= end {
+			// overlaping
+			if interval[1] > end {
+				end = interval[1]
+			}
+		} else {
+			// not overlapping
+			// 将上一个区间加入结果
+			result = append(result, []int{
+				start, end,
+			})
+			// reset 上一个区间的start和end为当前区间
+			start = interval[0]
+			end = interval[1]
+		}
 	}
 
+	result = append(result, []int{
+		start, end,
+	})
 	return result
 }
 
